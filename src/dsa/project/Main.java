@@ -26,8 +26,8 @@ public class Main {
          saxParser.parse(inputFile, userhandler); 
          for (int i=0;i<20;i++)
          {
-          String patternStr = "[{{:;=</>|,'.*\"+()\\[\\]-[0-9]}}]";
-          String replacementStr = " ";
+          String patternStr = "([{:;=</>|,%'.*\"+#$_()\\[\\]-[0-9]}])";
+          String replacementStr = "";
          
           // Compile regular expression
           Pattern pattern = Pattern.compile(patternStr);
