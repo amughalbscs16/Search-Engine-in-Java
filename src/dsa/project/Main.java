@@ -11,6 +11,8 @@ import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Main {
     static WebPage WebPages[]=new WebPage[1000];
@@ -24,8 +26,18 @@ public class Main {
          saxParser.parse(inputFile, userhandler); 
          for (int i=0;i<20;i++)
          {
-            System.out.println(WebPages[i].title+"\n"+WebPages[i].body);
-         }        
+          String patternStr = "[{{:;=</>|,'.*\"+()\\[\\]-[0-9]}}]";
+          String replacementStr = " ";
+         
+          // Compile regular expression
+          Pattern pattern = Pattern.compile(patternStr);
+         
+          // Replace all occurrences of pattern in input
+          Matcher matcher = pattern.matcher(WebPages[i].body);
+          WebPages[i].body = matcher.replaceAll(replacementStr);
+         }
+          for (int i=0;i<20;i++)
+              System.out.println(WebPages[i].title+"\n"+WebPages[i].body);
       } catch (Exception e) {
          e.printStackTrace();
       }
