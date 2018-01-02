@@ -13,7 +13,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import org.tartarus.martin.Stemmer;
 public class Main {
     static WebPage WebPages[]=new WebPage[1000];
    public static void main(String[] args) throws SAXException, ParserConfigurationException, IOException {
@@ -23,81 +23,44 @@ public class Main {
          SAXParserFactory factory = SAXParserFactory.newInstance();
          SAXParser saxParser = factory.newSAXParser();
          UserHandler userhandler = new UserHandler();
-         saxParser.parse(inputFile, userhandler); 
+         saxParser.parse(inputFile, userhandler);
          for (int i=0;i<20;i++)
          {
-          String patternStr = "([{:;=</>|,%'.*\"+#$_()\\[\\]-[0-9]}])";
-          String replacementStr = "";
+             //([{:;=</>|,%'.*\"+#$_()\\[\\]-[0-9]!&}])
+          String patternStr = "[^a-zA-Z0-9\\s]";
+          String replacementStr = " ";
          
           // Compile regular expression
           Pattern pattern = Pattern.compile(patternStr);
-         
+          
           // Replace all occurrences of pattern in input
-          Matcher matcher = pattern.matcher(WebPages[i].body);
-          WebPages[i].body = matcher.replaceAll(replacementStr);
+          Matcher matcher = pattern.matcher(WebPages[i].getText());
+          WebPages[i].setText(WebPages[i].getText().replaceAll(patternStr," "));
+          String[] removeWords = {"a\\s","b\\s","c\\s","d\\s","e\\s","f\\s","g\\s","h\\s",
+              "h\\s","i\\s","j\\s","k\\s","l\\s","m\\s","n\\s",
+              "o\\s","p\\s","q\\s","r\\s","s\\s","t\\s","u\\s","v\\s","w\\s","x\\s","y\\s","z\\s",
+              "under","with","next","around","through","is","the","th","and","as",
+              "each","for","to","have","has","of","off","them","in","it","on","at","an","other"};
+          for (int j=0;j<removeWords.length;j++)
+          WebPages[i].setText(WebPages[i].getText().replaceAll("\\s"+removeWords[j], " "));
          }
-          for (int i=0;i<20;i++)
-              System.out.println(WebPages[i].title+"\n"+WebPages[i].body);
+         Stemmer stem;
+          for (int i=0;i<20;i++){
+              //System.out.println("Id:"+WebPages[i].id+"\n"+WebPages[i].title+"\n"+WebPages[i].body);
+              stem = new Stemmer();
+              stem.add(WebPages[i].getText().toCharArray(), WebPages[i].getText().length());
+              stem.stem();
+              WebPages[i].setText(stem.toString());
+              String bodywords[] = WebPages[i].getText().split("\\s+");
+              System.out.println("\nId: "+WebPages[i].getId());
+              System.out.println("Title: "+WebPages[i].getTitle() + " ");
+              
+              for (int j=0;j<bodywords.length;j++)
+                  System.out.print(bodywords[j]+" ");
+      }
       } catch (Exception e) {
          e.printStackTrace();
       }
    }   
 }
-class WebPage{
-WebPage(String title,String body)
-{
-this.title = title; this.body = body;
-}
-String title;
-String body;
-public String toString() {
-        return this.title + this.body;
-    }
-}
 
-class UserHandler extends DefaultHandler {
-   static WebPage WebPages[] = new WebPage[500];
-   boolean bTitle = false;
-   boolean bRevision = false;
-   boolean bText = false;
-   String title = "";
-   int pagecount = 0;
-   @Override
-   public void startElement(
-      String uri, String localName, String qName, Attributes attributes)
-      throws SAXException {
-      
-      if (qName.equalsIgnoreCase("page")) {
-      } else if (qName.equalsIgnoreCase("title")) {
-         bTitle = true;
-      }  else if (qName.equalsIgnoreCase("text")) {
-         bText = true;
-      }
-   }
-
-   @Override
-   public void endElement(String uri, 
-      String localName, String qName) throws SAXException {
-      if (qName.equalsIgnoreCase("page")) {
-         makeWebPage();
-         characters.setLength(0);
-         bText=false;
-      } 
-   }
-    private final StringBuilder characters = new StringBuilder(64);
-   @Override
-    public void characters(char ch[], int start, int length) throws SAXException {
-      
-      if (bTitle) {
-         title = (new String(ch,start,length));
-         bTitle = false;
-      } else if (bText) {
-          characters.append(new String(ch,start,length));
-      }
-   }
-    public void makeWebPage()
-    {
-        Main.WebPages[this.pagecount] = new WebPage(this.title,this.characters.toString());
-        this.pagecount++;
-    }
-}
