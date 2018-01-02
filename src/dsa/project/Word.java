@@ -28,7 +28,7 @@ int getCount(int index)
 {
    return count[index]; 
 }
-void setAvailable(int index, boolean available)
+void setAvailable(boolean available,int index)
 {
     this.available[index]=available;
 }

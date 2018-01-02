@@ -54,9 +54,10 @@ public class Main {
               String bodywords[] = WebPages[i].getText().split("\\s+");
               System.out.println("\nId: "+WebPages[i].getId());
               System.out.println("Title: "+WebPages[i].getTitle() + " ");
-              
+              //Now Use hashmaps with words;
               for (int j=0;j<bodywords.length;j++)
                   System.out.print(bodywords[j]+" ");
+              
       }
       } catch (Exception e) {
          e.printStackTrace();
