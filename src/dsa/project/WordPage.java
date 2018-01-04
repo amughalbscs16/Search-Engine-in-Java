@@ -9,12 +9,24 @@ package dsa.project;
  *
  * @author AliHassaanM
  */
-public class Word {
+public class WordPage {
 int pageid;
 int count[] = {0,0};//0 for Title 1 for text
-boolean available[] = {false,false};
-Word(int pageid){
+double pagerank = 0.0;
+WordPage()
+{
+}
+WordPage(int pageid,int index)//index 0 for Title 1 for Text
+{
 setPageId(pageid);
+incrementCount(1,index);
+}
+double getPageRank(){
+return this.pagerank;
+}
+void setPageRank(double pagerank)
+{
+this.pagerank = pagerank;
 }
 final void setPageId(int pageid)
 {
@@ -28,12 +40,5 @@ int getCount(int index)
 {
    return count[index]; 
 }
-void setAvailable(boolean available,int index)
-{
-    this.available[index]=available;
-}
-boolean getAvailable(int index)
-{
-    return this.available[index];
-}
+
 }

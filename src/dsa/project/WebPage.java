@@ -6,6 +6,7 @@ final public class WebPage {
     private String title;
     private String text;
      private int id;
+
 WebPage(int id,String title,String text){
     this.setId(id);
     this.setTitle(title);
