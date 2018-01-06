@@ -7,8 +7,12 @@ package dsa.project;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.util.Hashtable;
 import java.util.Set;
@@ -22,6 +26,13 @@ import org.tartarus.martin.Stemmer;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+import java.text.DecimalFormat;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 /**
  *
@@ -89,11 +100,18 @@ public class UserHandler extends DefaultHandler {
           characters.append(new String(ch,start,length));
       }
    }
+    static int countpages = 0;
     public void makeWebPage() throws IOException
     {
+        /*If you start from the middle you need to do this from here
+		start doing from where left before*/
+        //Count for how many pages have been done;
+		//if(id>value){
+        countpages +=1 ;
         Page = (new WebPage(this.id,this.title.toLowerCase(),this.characters.toString().toLowerCase()));
         this.pagecount++;
         doWork();
+        //}
     }
     public static void doWork() throws IOException
     {     
@@ -116,17 +134,20 @@ public class UserHandler extends DefaultHandler {
           for (int j=0;j<removeWords.length;j++){
           Page.setText(Page.getText().replaceAll("\\s"+removeWords[j], " "));
           }
-           Stemmer stem;
-
-            stem = new Stemmer();
-            int length = Page.getText().length();
-            stem.add(Page.getTitle().toCharArray(),Page.getTitle().length());
-            stem.stem();
-            Page.setText(stem.toString());
+             String titleWords[] = Page.getTitle().split(" ");
+             String textWords[] = Page.getText().split(" ");
+//                Stemmer stem;
+//                for (int i=0;i<titleWords.length;i++)
+//                {
+//                    stem = new Stemmer();
+//                    stem.add(titleWords[i].toCharArray(),titleWords[i].length()-1);
+//                    stem.stem();
+//                    titleWords[i] = stem.toString();
+//                }
+                
             //Word to Pages And Writing to Files
             Hashtable<String,WordPage> Table = new Hashtable<>();
-       String titleWords[] = Page.getTitle().split(" ");
-       String textWords[] = Page.getText().split(" ");
+       
        WordPage check = new WordPage();
        String directory = "D:\\Search Engine Java\\processeddata\\";
        for (int i=0;i<titleWords.length;i++)
@@ -134,7 +155,11 @@ public class UserHandler extends DefaultHandler {
            check = Table.get(titleWords[i]);
        if (check == null){
            Table.put(titleWords[i], new WordPage(Page.getId(),0));
+           check = Table.get(titleWords[i]);
+           check.incrementCount(1, 0);
+           check.setPageRank(check.getPageRank()+ (1/((i+10)/10)));
        } else {
+          check.setPageRank(check.getPageRank()+ (1/((i+10)/10)));
           check.incrementCount(1,0);    
        }
        check = null;
@@ -144,19 +169,22 @@ public class UserHandler extends DefaultHandler {
          check = Table.get(textWords[i]);
          if (check == null){
            Table.put(textWords[i], new WordPage(Page.getId(),1));
+           check = Table.get(textWords[i]);
+           check.incrementCount(1, 1);
+           check.setPageRank(check.getPageRank()+ (0.2/(((i+100)/100))));
          }
          else {
-           check.incrementCount(1,1);
+           check.incrementCount(1, 1);
+           check.setPageRank(check.getPageRank()+ (0.3/(((i+100)/100))));
          }     
        }
         double pagerank;
         WordPage temporary;
         Set<String> keys = Table.keySet();
         //System.out.println(keys.size());
+        DecimalFormat format = new DecimalFormat("#.####");
         for(String key: keys){
             temporary = Table.get(key);
-            pagerank = (temporary.getCount(0) + (temporary.getCount(1) / 20.0));
-            temporary.setPageRank(pagerank);
             //System.out.println("Count of "+key+" in title is: "+temporary.getCount(0) +" and body is: "+temporary.getCount(1) + " and page rank is: "+temporary.getPageRank());
             File dir = new File(directory+key);
             boolean dirsuccess = dir.mkdirs();
@@ -169,12 +197,13 @@ public class UserHandler extends DefaultHandler {
                 if(filesuccess || file.exists())
                 {
                     //System.out.println(key+" \\documents.txt " + "File Exists or Created Successful");
-                    try (FileWriter f = new FileWriter(filename, true);
-                    BufferedWriter b = new BufferedWriter(f); 
-                    PrintWriter p = new PrintWriter(b);) 
+                    try(FileWriter f = new FileWriter(filename, true);
+                        BufferedWriter b = new BufferedWriter(f); 
+                        PrintWriter p = new PrintWriter(b);)
                     {
-                        p.println(Page.getId()+","+temporary.getPageRank()+","+temporary.getCount(0)+","
-                                +temporary.getCount(1)+","+Page.getTitle()+"::");
+                     
+                        p.println(Page.getId()+","+format.format(temporary.getPageRank())+","+temporary.getCount(0)+","
+                                +temporary.getCount(1)+","+Page.getTitle()+":");
                         
                     } catch (IOException i)
                     { 
@@ -190,6 +219,16 @@ public class UserHandler extends DefaultHandler {
                 //System.out.println(key+" Directory Does not exist and cannot be created");
             }
         }
-            System.out.println(Page.getId()+" ");
+            System.out.println(Page.getId()+" : "+ countpages);
+            try (FileWriter f = new FileWriter("D:\\Search Engine Java\\pagerecord.txt", true);
+                    BufferedWriter b = new BufferedWriter(f); 
+                    PrintWriter p = new PrintWriter(b);) 
+                    {
+                        p.println(Page.getId()+"\n");
+                        
+                    } catch (IOException i)
+                    { 
+                        i.printStackTrace();
+                    }
     }
 }
