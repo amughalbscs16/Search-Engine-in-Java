@@ -62,65 +62,92 @@ class SearchingPart {
      */
        public static void Search(String sentence) throws FileNotFoundException
          {
-        String words[] = sentence.split("[\\s+]");
-        String directory = "D:\\Search Engine Java\\processeddata\\";
-        Hashtable<Integer,WordPage> htable;
-        htable = new Hashtable<>();
-        ArrayList<WordPage> Result = new ArrayList<>();
-        File file;          String content="";     Scanner input;
-        for(String word:words)
-        {
-            System.out.println("Word is :"+word);
-         int id=0;
-         try{
-         file = new File(directory+"\\"+word+"\\documents.txt");
-         input =new Scanner(file);
-         while(input.hasNext())
-         {
-         String line = input.nextLine();
-         try{
-         id = Integer.parseInt(line.split(",")[0]);
-         }
-         catch(ArrayIndexOutOfBoundsException aioob)
-         {
-         }
-                /*Making a List from
-                HashMap of WordPages and incrementing pagerank of repeated pages.*/
-         WordPage check = htable.get(id);
-         if(check == null){
-         htable.put(id,new WordPage(line));
-         }
-         else 
-         {
-             htable.get(id).incrementPageRank(check.getPageRank());
-             htable.get(id).incrementCount(check.getCount(0), 0);
-             htable.get(id).incrementCount(check.getCount(1), 1);
-         }
-         }   
+             
+        //Replacing Raw Data
+             String patternStr = "[^a-zA-Z0-9]";
+          // Compile regular expression
+          Pattern pattern = Pattern.compile(patternStr);
+          // Replace all occurrences of pattern in input
+          Matcher matcher = pattern.matcher(sentence);
+          sentence = sentence.replaceAll(patternStr," ");
+          String[] removeWords = {
+              "under","with","next","around","through","is","the","th","and","as",
+              "each","for","to","have","has","of","off","them","in","it","on","at","an","other","all","some","none"};
+          for (int j=0;j<removeWords.length;j++){
+          sentence = sentence.replaceAll("\\s"+removeWords[j], "");
+          }
+            //Searching Code     
+            String words[] = sentence.split("[\\s+]");
+            String directory = "D:\\Search Engine Java\\processeddata\\";
+            Hashtable<Integer,WordPage> htable;
+            htable = new Hashtable<>();
+            ArrayList<WordPage> Result = new ArrayList<>();
+            File file;          String content="";     Scanner input;
+            for(String word:words)
+            {
+                if(word!=" "){
+                System.out.println("Word is :"+word);
+             int id=0;
+             try{
+             file = new File(directory+"\\"+word+"\\documents.txt");
+             input =new Scanner(file);
+             while(input.hasNext())
+             {
+             String line = input.nextLine();
+             try{
+             id = Integer.parseInt(line.split(",")[0]);
+             }
+             catch(ArrayIndexOutOfBoundsException aioob)
+             {
+             }
+                    /*Making a List from
+                    HashMap of WordPages and incrementing pagerank of repeated pages.*/
+             WordPage check = htable.get(id);
+             if(check == null){
+             htable.put(id,new WordPage(line));
+             }
+             else 
+             {
+                 htable.get(id).incrementPageRank(check.getPageRank());
+                 htable.get(id).incrementCount(check.getCount(0), 0);
+                 htable.get(id).incrementCount(check.getCount(1), 1);
+             }
+             }   
+            }
+            
+             catch (FileNotFoundException fnfe)
+            {
+                    System.out.println("No Results Available for this Query");
+            }
+            }
+            }
+            Set<Integer> keys = htable.keySet();
+            /*Generating a Result List.*/
+            for (int key:keys)
+            {
+                Result.add(htable.get(key));
+            }
+            Collections.sort(Result, new RankComparator());
+            /*Printing The Search Results.*/
+            int count = 0;
+            int check = 0;
+            System.out.println("Total Generated Results are: "+Result.size());
+            do{
+                
+            for (int k=count;k<count+50;k++){
+            try{
+            System.out.println(Result.get(k).toStringDisplay());  
+            }
+            catch(ArrayIndexOutOfBoundsException ioobe){
+            }catch(IndexOutOfBoundsException iiebe){
+            }
+
+            }
+            System.out.println("Want to Display More Press 1:");
+            check = new Scanner(System.in).nextInt();
+            count+=50;
+            } while (check == 1 && count <= Result.size()); //Ask from user if he wants to display more or not.
         }
-         catch (FileNotFoundException fnfe)
-        {
-                System.out.println("No Results Available for this Query");
-        }
-        }
-        Set<Integer> keys = htable.keySet();
-        /*Generating a Result List.*/
-        for (int key:keys)
-        {
-            Result.add(htable.get(key));
-        }
-        Collections.sort(Result, new RankComparator());
-        /*Printing The Search Results.*/
-        System.out.println("Total Generated Results are: "+Result.size());
-        for (int k=0;k<20;k++){
-        try{
-        System.out.println(Result.get(k).toStringDisplay());  
-        }
-        catch(ArrayIndexOutOfBoundsException ioobe){
-        }
-        
-        }
-    }
     
 }
 class RankComparator implements Comparator<WordPage>{

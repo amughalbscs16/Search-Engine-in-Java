@@ -75,6 +75,6 @@ public String toString()
 }
 public String toStringDisplay()
 {
-    return "Page Id: "+this.pageid+" Weightage: "+this.getPageRank()+" Title Count: "+this.getCount(0)+" Body Count: "+this.getCount(1)+" Title: "+this.getTitle()+":";
+    return "Page Id: "+this.pageid+" Weightage: "+this.getPageRank()+" Title Count: "+this.getCount(0)+" Body Count: "+this.getCount(1)+" ==> Page Title: "+this.getTitle()+":";
 }
 }
