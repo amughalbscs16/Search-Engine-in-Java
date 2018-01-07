@@ -25,7 +25,7 @@ public class Main {
     
    public static void main(String[] args) throws SAXException, ParserConfigurationException, IOException {
        int todo = 0;
-       System.out.println("What do you want to do? {search or process}");
+       System.out.println("What do you want to do? {1(process) or 2(search)}");
        Scanner input = new Scanner(System.in);
        todo = input.nextInt();
        if (todo == 1){
