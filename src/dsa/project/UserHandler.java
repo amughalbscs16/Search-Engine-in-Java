@@ -39,7 +39,7 @@ import java.util.Scanner;
  * @author AliHassaanM
  */
 public class UserHandler extends DefaultHandler {
-   static WebPage Page;
+   static WebPager Page;
    boolean bTitle = false;
    boolean bRevision = false;
    boolean bText = false;
@@ -106,12 +106,12 @@ public class UserHandler extends DefaultHandler {
         /*If you start from the middle you need to do this from here
 		start doing from where left before*/
         //Count for how many pages have been done;
-		//if(id>value){
+		if(id>73458 && id < 200000-1){
         countpages +=1 ;
-        Page = (new WebPage(this.id,this.title.toLowerCase(),this.characters.toString().toLowerCase()));
+        Page = (new WebPager(this.id,this.title.toLowerCase(),this.characters.toString().toLowerCase()));
         this.pagecount++;
         doWork();
-        //}
+        }
     }
     public static void doWork() throws IOException
     {     

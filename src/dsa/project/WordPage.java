@@ -25,7 +25,13 @@ WordPage(String data)
     pagerank = Double.parseDouble(data1[1]);
     count[0] = Integer.parseInt(data1[2]);
     count[1] = Integer.parseInt(data1[3]);
+    try{
     title = data1[4];
+    }catch(ArrayIndexOutOfBoundsException i)
+    {
+        i.printStackTrace();
+        title = "Not Found";
+    }
 }
 WordPage(int pageid,int index)//index 0 for Title 1 for Text
 {
@@ -57,5 +63,18 @@ int getPageID()
 String getTitle()
 {
     return title;
+}
+void incrementPageRank(double howmuch)
+{
+    this.pagerank += howmuch;
+}
+@Override
+public String toString()
+{
+    return this.pageid+","+this.getPageRank()+","+this.getCount(0)+","+this.getCount(1)+","+this.getTitle()+":";
+}
+public String toStringDisplay()
+{
+    return "Page Id: "+this.pageid+" Weightage: "+this.getPageRank()+" Title Count: "+this.getCount(0)+" Body Count: "+this.getCount(1)+" Title: "+this.getTitle()+":";
 }
 }

@@ -2,12 +2,12 @@ package dsa.project;
 /**
  * @Author AliHassaanM
 **/
-final public class WebPage {
+final public class WebPager {
     private String title;
     private String text;
      private int id;
 
-WebPage(int id,String title,String text){
+WebPager(int id,String title,String text){
     this.setId(id);
     this.setTitle(title);
     this.setText(text);
