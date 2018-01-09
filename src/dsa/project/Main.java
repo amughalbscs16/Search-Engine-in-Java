@@ -83,6 +83,27 @@ class SearchingPart {
             htable = new Hashtable<>();
             ArrayList<WordPage> Result = new ArrayList<>();
             File file;          String content="";     Scanner input;
+            if(words.length < 2)
+            {
+               if(words[0]!=" "){
+                System.out.println("Word is :"+words[0]);
+             int id=0;
+             try{
+                 System.out.println("Single word Searching");
+             file = new File(directory+"\\"+words[0]+"\\documents.txt");
+             input =new Scanner(file);
+             while(input.hasNext())
+             {
+             Result.add(new WordPage(input.nextLine()));
+             }
+             }
+             catch (FileNotFoundException fnfe)
+             {
+                    System.out.println("No Results Available for this Query");
+             } 
+            }
+            }
+            else{
             for(String word:words)
             {
                 if(word!=" "){
@@ -100,6 +121,8 @@ class SearchingPart {
              catch(ArrayIndexOutOfBoundsException aioob)
              {
              }
+             
+             
                     /*Making a List from
                     HashMap of WordPages and incrementing pagerank of repeated pages.*/
              WordPage check = htable.get(id);
@@ -108,13 +131,13 @@ class SearchingPart {
              }
              else 
              {
-                 htable.get(id).incrementPageRank(check.getPageRank());
+                 WordPage tempcheck = new WordPage(line);
+                 htable.get(id).incrementPageRank(tempcheck.getPageRank());
                  htable.get(id).incrementCount(check.getCount(0), 0);
                  htable.get(id).incrementCount(check.getCount(1), 1);
              }
              }   
             }
-            
              catch (FileNotFoundException fnfe)
             {
                     System.out.println("No Results Available for this Query");
@@ -128,6 +151,7 @@ class SearchingPart {
                 Result.add(htable.get(key));
             }
             Collections.sort(Result, new RankComparator());
+            }
             /*Printing The Search Results.*/
             int count = 0;
             int check = 0;
